@@ -1053,7 +1053,7 @@
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "transportation",
-      "minzoom": 14,
+      "minzoom": 13,
       "filter": [
         "all",
         [
@@ -1064,7 +1064,8 @@
           false
         ],
         ["match", ["get", "brunnel"], ["bridge", "tunnel"], false, true],
-        ["match", ["get", "class"], ["path", "pedestrian"], true, false]
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], false, true]
       ],
       "layout": {"line-join": "round"},
       "paint": {
@@ -1078,6 +1079,73 @@
           1,
           20,
           10
+        ]
+      }
+    },
+    {
+      "id": "road_path_pedestrian_trail_casing",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "minzoom": 13,
+      "filter": [
+        "all",
+        [
+          "match",
+          ["geometry-type"],
+          ["LineString", "MultiLineString"],
+          true,
+          false
+        ],
+        ["match", ["get", "brunnel"], ["bridge", "tunnel"], false, true],
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], true, false]
+      ],
+      "layout": {"line-join": "round"},
+      "paint": {
+        "line-color": "hsl(47,61%,51%)",
+        "line-width": [
+          "interpolate",
+          ["exponential", 1.2],
+          ["zoom"],
+          13,
+          1,
+          16,
+          4
+        ]
+      }
+    },
+    {
+      "id": "road_path_pedestrian_trail",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "minzoom": 13,
+      "filter": [
+        "all",
+        [
+          "match",
+          ["geometry-type"],
+          ["LineString", "MultiLineString"],
+          true,
+          false
+        ],
+        ["match", ["get", "brunnel"], ["bridge", "tunnel"], false, true],
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], true, false]
+      ],
+      "layout": {"line-join": "round"},
+      "paint": {
+        "line-color": "hsl(0,0%,100%)",
+        "line-dasharray": [2.5, 1],
+        "line-width": [
+          "interpolate",
+          ["exponential", 1.2],
+          ["zoom"],
+          13,
+          0.5,
+          16,
+          2
         ]
       }
     },
@@ -1545,7 +1613,8 @@
           false
         ],
         ["==", ["get", "brunnel"], "bridge"],
-        ["match", ["get", "class"], ["path", "pedestrian"], true, false]
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], false, true]
       ],
       "paint": {
         "line-color": "hsl(35,6%,80%)",
@@ -1558,6 +1627,38 @@
           1.5,
           20,
           18
+        ]
+      }
+    },
+    {
+      "id": "bridge_path_pedestrian_trail_casing",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        [
+          "match",
+          ["geometry-type"],
+          ["LineString", "MultiLineString"],
+          true,
+          false
+        ],
+        ["==", ["get", "brunnel"], "bridge"],
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], true, false]
+      ],
+      "paint": {
+        "line-color": "hsl(47,61%,51%)",
+        "line-dasharray": [1, 0],
+        "line-width": [
+          "interpolate",
+          ["exponential", 1.2],
+          ["zoom"],
+          14,
+          2,
+          20,
+          12
         ]
       }
     },
@@ -1657,7 +1758,8 @@
           false
         ],
         ["==", ["get", "brunnel"], "bridge"],
-        ["match", ["get", "class"], ["path", "pedestrian"], true, false]
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], false, true]
       ],
       "paint": {
         "line-color": "hsl(0,0%,100%)",
@@ -1670,6 +1772,38 @@
           0.5,
           20,
           10
+        ]
+      }
+    },
+    {
+      "id": "bridge_path_pedestrian_trail",
+      "type": "line",
+      "source": "openmaptiles",
+      "source-layer": "transportation",
+      "filter": [
+        "all",
+        [
+          "match",
+          ["geometry-type"],
+          ["LineString", "MultiLineString"],
+          true,
+          false
+        ],
+        ["==", ["get", "brunnel"], "bridge"],
+        ["match", ["get", "class"], ["path", "pedestrian"], true, false],
+        ["match", ["get", "subclass"], ["path", "footway"], true, false]
+      ],
+      "paint": {
+        "line-color": "hsl(0,0%,100%)",
+        "line-dasharray": [0.8, 0.3],
+        "line-width": [
+          "interpolate",
+          ["exponential", 1.2],
+          ["zoom"],
+          14,
+          1,
+          20,
+          6
         ]
       }
     },
