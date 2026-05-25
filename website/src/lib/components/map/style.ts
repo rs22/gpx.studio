@@ -10,7 +10,8 @@ import {
 import { getLayers } from '$lib/components/map/layer-control/utils';
 import { i18n } from '$lib/i18n.svelte';
 
-const { currentBasemap, currentOverlays, customLayers, opacities, terrainSource } = settings;
+const { currentBasemap, currentOverlays, customLayers, opacities, terrainSource, distanceUnits } =
+    settings;
 
 const emptySource: maplibregl.GeoJSONSourceSpecification = {
     type: 'geojson',
@@ -57,6 +58,9 @@ export class StyleManager {
         opacities.subscribe(() => this.updateOverlays());
         terrainSource.subscribe(() => this.updateTerrain());
         customLayers.subscribe(() => this.updateBasemap());
+        distanceUnits.subscribe(() => {
+            if (get(currentBasemap) === 'topo') this.updateBasemap();
+        });
     }
 
     updateBasemap() {
@@ -217,7 +221,12 @@ export class StyleManager {
 
     merge(style: maplibregl.StyleSpecification, other: maplibregl.StyleSpecification) {
         style.sources = { ...style.sources, ...other.sources };
+        const units = get(distanceUnits);
         for (let layer of other.layers ?? []) {
+            if ('source' in layer) {
+                if (layer.source == 'contours_m' && units === 'imperial') continue;
+                if (layer.source == 'contours_ft' && units !== 'imperial') continue;
+            }
             if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
                 const textField = layer.layout['text-field'];
                 if (
