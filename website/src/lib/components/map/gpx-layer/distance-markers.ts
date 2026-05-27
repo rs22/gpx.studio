@@ -74,7 +74,7 @@ export class DistanceMarkers {
                             layout: {
                                 'text-field': ['get', 'distance'],
                                 'text-size': 14,
-                                'text-font': ['Open Sans Bold'],
+                                'text-font': ['Noto Sans Bold'],
                             },
                             paint: {
                                 'text-color': 'black',
