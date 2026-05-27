@@ -27,14 +27,12 @@ import ignFrTopo from './custom/ign-fr-topo.json';
 import ignFrPlan from './custom/ign-fr-plan.json';
 import ignFrSatellite from './custom/ign-fr-satellite.json';
 import bikerouterGravel from './custom/bikerouter-gravel.json';
-import topo from './custom/topo.json';
-import satellite from './custom/satellite.json';
 
 export const maptilerKeyPlaceHolder = 'MAPTILER_KEY';
 
 export const basemaps: { [key: string]: string | StyleSpecification } = {
-    topo: topo as StyleSpecification,
-    satellite: satellite as StyleSpecification,
+    topo: 'https://raw.githubusercontent.com/gpxstudio/styles/refs/heads/main/topo.json',
+    satellite: 'https://raw.githubusercontent.com/gpxstudio/styles/refs/heads/main/satellite.json',
     esriSatellite: {
         version: 8,
         sources: {

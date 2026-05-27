@@ -91,6 +91,18 @@ export class StyleManager {
         let basemapStyle = basemaps.openStreetMap as maplibregl.StyleSpecification;
         try {
             basemapStyle = await this.get(basemapInfo);
+            for (const source in basemapStyle.sources) {
+                const src = basemapStyle.sources[source];
+                if (
+                    src &&
+                    typeof src === 'object' &&
+                    'url' in src &&
+                    typeof src.url === 'string' &&
+                    src.url.includes(maptilerKeyPlaceHolder)
+                ) {
+                    src.url = src.url.replace(maptilerKeyPlaceHolder, this._maptilerKey);
+                }
+            }
         } catch (e) {
             console.error(e.message);
         }
@@ -199,18 +211,6 @@ export class StyleManager {
             const style = await response.json();
             return style;
         } else {
-            for (const source in styleInfo.sources) {
-                const src = styleInfo.sources[source];
-                if (
-                    src &&
-                    typeof src === 'object' &&
-                    'url' in src &&
-                    typeof src.url === 'string' &&
-                    src.url.includes(maptilerKeyPlaceHolder)
-                ) {
-                    src.url = src.url.replace(maptilerKeyPlaceHolder, this._maptilerKey);
-                }
-            }
             return styleInfo;
         }
     }
