@@ -10,7 +10,8 @@ import {
 import { getLayers } from '$lib/components/map/layer-control/utils';
 import { i18n } from '$lib/i18n.svelte';
 
-const { currentBasemap, currentOverlays, customLayers, opacities, terrainSource } = settings;
+const { currentBasemap, currentOverlays, customLayers, opacities, terrainSource, distanceUnits } =
+    settings;
 
 const emptySource: maplibregl.GeoJSONSourceSpecification = {
     type: 'geojson',
@@ -57,15 +58,21 @@ export class StyleManager {
         opacities.subscribe(() => this.updateOverlays());
         terrainSource.subscribe(() => this.updateTerrain());
         customLayers.subscribe(() => this.updateBasemap());
+        distanceUnits.subscribe(() => {
+            if (get(currentBasemap) === 'libertyTopo') this.updateBasemap();
+        });
     }
 
     updateBasemap() {
         const map_ = get(this._map);
         if (!map_) return;
-        this.buildStyle().then((style) => map_.setStyle(style));
+        let basemap = get(currentBasemap);
+        this.buildStyle(basemap).then((style) => {
+            if (get(currentBasemap) === basemap) map_.setStyle(style);
+        });
     }
 
-    async buildStyle(): Promise<maplibregl.StyleSpecification> {
+    async buildStyle(basemap: string): Promise<maplibregl.StyleSpecification> {
         const custom = get(customLayers);
 
         const style: maplibregl.StyleSpecification = {
@@ -79,22 +86,31 @@ export class StyleManager {
             layers: [],
         };
 
-        let basemap = get(currentBasemap);
         const basemapInfo = basemaps[basemap] ?? custom[basemap]?.value ?? basemaps[defaultBasemap];
 
         let basemapStyle = basemaps.openStreetMap as maplibregl.StyleSpecification;
         try {
             basemapStyle = await this.get(basemapInfo);
+            for (const source in basemapStyle.sources) {
+                const src = basemapStyle.sources[source];
+                if (
+                    src &&
+                    typeof src === 'object' &&
+                    'url' in src &&
+                    typeof src.url === 'string' &&
+                    src.url.includes(maptilerKeyPlaceHolder)
+                ) {
+                    src.url = src.url.replace(maptilerKeyPlaceHolder, this._maptilerKey);
+                }
+            }
         } catch (e) {
             console.error(e.message);
         }
         this.merge(style, basemapStyle);
 
-        if (this._maptilerKey !== '') {
-            const terrain = this.getCurrentTerrain();
-            style.sources[terrain.source] = terrainSources[terrain.source];
-            style.terrain = terrain.exaggeration > 0 ? terrain : undefined;
-        }
+        const terrain = this.getCurrentTerrain();
+        style.sources[terrain.source] = terrainSources[terrain.source];
+        style.terrain = terrain.exaggeration > 0 ? terrain : undefined;
 
         style.layers.push(...anchorLayers);
 
@@ -166,7 +182,6 @@ export class StyleManager {
     }
 
     updateTerrain() {
-        if (this._maptilerKey === '') return;
         const map_ = get(this._map);
         if (!map_) return;
 
@@ -189,9 +204,6 @@ export class StyleManager {
     ): Promise<maplibregl.StyleSpecification> {
         if (typeof styleInfo === 'string') {
             let styleUrl = styleInfo as string;
-            if (styleUrl.includes(maptilerKeyPlaceHolder)) {
-                styleUrl = styleUrl.replace(maptilerKeyPlaceHolder, this._maptilerKey);
-            }
             const response = await fetch(styleUrl, { cache: 'force-cache' });
             if (!response.ok) {
                 throw new Error(`HTTP error fetching style "${styleInfo}": ${response.status}`);
@@ -205,23 +217,46 @@ export class StyleManager {
 
     merge(style: maplibregl.StyleSpecification, other: maplibregl.StyleSpecification) {
         style.sources = { ...style.sources, ...other.sources };
+        const units = get(distanceUnits);
         for (let layer of other.layers ?? []) {
+            if ('source' in layer) {
+                if (layer.source == 'contours_m' && units === 'imperial') continue;
+                if (layer.source == 'contours_ft' && units !== 'imperial') continue;
+            }
             if (layer.type === 'symbol' && layer.layout && layer.layout['text-field']) {
                 const textField = layer.layout['text-field'];
-                if (
-                    Array.isArray(textField) &&
-                    textField.length >= 2 &&
-                    textField[0] === 'coalesce' &&
-                    Array.isArray(textField[1]) &&
-                    textField[1][0] === 'get' &&
-                    typeof textField[1][1] === 'string' &&
-                    textField[1][1].startsWith('name')
-                ) {
-                    layer.layout['text-field'] = [
-                        'coalesce',
-                        ['get', `name:${i18n.lang}`],
-                        ['get', 'name'],
-                    ];
+                if (Array.isArray(textField)) {
+                    if (
+                        textField.length == 4 &&
+                        Array.isArray(textField[3]) &&
+                        textField[3][0] === 'coalesce' &&
+                        Array.isArray(textField[3][1]) &&
+                        textField[3][1][0] === 'get' &&
+                        typeof textField[3][1][1] === 'string' &&
+                        textField[3][1][1].startsWith('name')
+                    ) {
+                        // OpenFreeMap styles
+                        layer.layout['text-field'] = [
+                            'coalesce',
+                            ['get', `name:${i18n.lang}`],
+                            ['get', 'name'],
+                        ];
+                    }
+                    if (
+                        textField.length == 3 &&
+                        textField[0] === 'coalesce' &&
+                        Array.isArray(textField[1]) &&
+                        textField[1][0] === 'get' &&
+                        typeof textField[1][1] === 'string' &&
+                        textField[1][1].startsWith('name')
+                    ) {
+                        // OpenMapTiles styles
+                        layer.layout['text-field'] = [
+                            'coalesce',
+                            ['get', `name:${i18n.lang}`],
+                            ['get', 'name'],
+                        ];
+                    }
                 }
             }
             style.layers.push(layer);
@@ -236,10 +271,6 @@ export class StyleManager {
 
     getCurrentTerrain() {
         const terrain = get(terrainSource);
-        const source = terrainSources[terrain];
-        if (source.url && source.url.includes(maptilerKeyPlaceHolder)) {
-            source.url = source.url.replace(maptilerKeyPlaceHolder, this._maptilerKey);
-        }
         const map_ = get(this._map);
         return {
             source: terrain,

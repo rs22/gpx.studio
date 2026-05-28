@@ -31,10 +31,10 @@ import bikerouterGravel from './custom/bikerouter-gravel.json';
 export const maptilerKeyPlaceHolder = 'MAPTILER_KEY';
 
 export const basemaps: { [key: string]: string | StyleSpecification } = {
-    maptilerStreets: `https://api.maptiler.com/maps/streets-v4/style.json?key=${maptilerKeyPlaceHolder}`,
-    maptilerTopo: `https://api.maptiler.com/maps/topo-v4/style.json?key=${maptilerKeyPlaceHolder}`,
-    maptilerOutdoors: `https://api.maptiler.com/maps/outdoor-v4/style.json?key=${maptilerKeyPlaceHolder}`,
-    maptilerSatellite: `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${maptilerKeyPlaceHolder}`,
+    libertyTopo: 'https://styles.gpx.studio/liberty-topo.json',
+    libertySatellite: 'https://styles.gpx.studio/liberty-satellite.json',
+    osm: 'https://styles.gpx.studio/osm.json',
+    osmTopo: 'https://styles.gpx.studio/osm-topo.json',
     esriSatellite: {
         version: 8,
         sources: {
@@ -799,10 +799,10 @@ export type LayerTreeType = { [key: string]: LayerTreeType | boolean };
 export const basemapTree: LayerTreeType = {
     basemaps: {
         world: {
-            maptilerStreets: true,
-            maptilerTopo: true,
-            maptilerOutdoors: true,
-            maptilerSatellite: true,
+            libertyTopo: true,
+            libertySatellite: true,
+            osm: true,
+            osmTopo: true,
             esriSatellite: true,
             openStreetMap: true,
             openTopoMap: true,
@@ -936,7 +936,7 @@ export const overpassTree: LayerTreeType = {
 };
 
 // Default basemap used
-export const defaultBasemap = 'maptilerStreets';
+export const defaultBasemap = 'libertyTopo';
 
 // Default overlays used (none)
 export const defaultOverlays: LayerTreeType = {
@@ -1025,10 +1025,10 @@ export const defaultOverpassQueries: LayerTreeType = {
 export const defaultBasemapTree: LayerTreeType = {
     basemaps: {
         world: {
-            maptilerStreets: true,
-            maptilerTopo: true,
-            maptilerOutdoors: true,
-            maptilerSatellite: true,
+            libertyTopo: true,
+            libertySatellite: true,
+            osm: true,
+            osmTopo: true,
             esriSatellite: false,
             openStreetMap: true,
             openTopoMap: true,
@@ -1487,14 +1487,11 @@ export const overpassQueryData: Record<string, OverpassQueryData> = {
 };
 
 export const terrainSources: { [key: string]: RasterDEMSourceSpecification } = {
-    'maptiler-dem': {
-        type: 'raster-dem',
-        url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${maptilerKeyPlaceHolder}`,
-    },
     mapterhorn: {
         type: 'raster-dem',
-        url: 'https://tiles.mapterhorn.com/tilejson.json',
+        url: 'https://tiles.gpx.studio/mapterhorn.json',
+        encoding: 'terrarium',
     },
 };
 
-export const defaultTerrainSource = 'maptiler-dem';
+export const defaultTerrainSource = 'mapterhorn';

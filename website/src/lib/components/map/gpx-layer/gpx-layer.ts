@@ -251,11 +251,11 @@ export class GPXLayer {
                             source: this.fileId,
                             layout: {
                                 'text-field': '»',
-                                'text-offset': [0, -0.06],
+                                'text-offset': [0, -0.1],
                                 'text-keep-upright': false,
                                 'text-max-angle': 361,
                                 'text-allow-overlap': true,
-                                'text-font': ['Open Sans Bold'],
+                                'text-font': ['Noto Sans Bold'],
                                 'symbol-placement': 'line',
                                 'symbol-spacing': 20,
                             },
