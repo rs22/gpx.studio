@@ -414,6 +414,26 @@ export const overlays: { [key: string]: string | StyleSpecification } = {
             },
         ],
     },
+    openSeaMap: {
+        version: 8,
+        sources: {
+            openSeaMap: {
+                type: 'raster',
+                tiles: ['https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png'],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution:
+                    'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://www.openseamap.org">OpenSeaMap</a>',
+            },
+        },
+        layers: [
+            {
+                id: 'openSeaMap',
+                type: 'raster',
+                source: 'openSeaMap',
+            },
+        ],
+    },
     mapterhornHillshade: {
         version: 8,
         sources: {
@@ -868,6 +888,7 @@ export const overlayTree: LayerTreeType = {
             cyclOSMlite: true,
             mapterhornHillshade: true,
             openRailwayMap: true,
+            openSeaMap: true,
         },
         countries: {
             france: {
@@ -954,6 +975,7 @@ export const defaultOverlays: LayerTreeType = {
             cyclOSMlite: false,
             mapterhornHillshade: false,
             openRailwayMap: false,
+            openSeaMap: true,
         },
         countries: {
             france: {
@@ -1094,6 +1116,7 @@ export const defaultOverlayTree: LayerTreeType = {
             cyclOSMlite: false,
             mapterhornHillshade: false,
             openRailwayMap: false,
+            openSeaMap: true,
         },
         countries: {
             france: {
