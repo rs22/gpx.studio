@@ -39,7 +39,7 @@
         )
     );
     let files = $state(
-        'https://raw.githubusercontent.com/gpxstudio/gpx.studio/main/gpx/test-data/simple.gpx'
+        'https://raw.githubusercontent.com/rs22/gpx.studio/main/gpx/data/bornholm2026.gpx'
     );
     let driveIds = $state('');
 
